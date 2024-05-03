@@ -10,7 +10,7 @@ const Command = () => {
   const [drupalVersion, setDrupalVersion] = useState<DrupalVersionMachineCode>(DrupalVersionMachineCode.Drupal10);
 
   useEffect(() => {
-    async function fetchRecords() {
+    const fetchRecords = async () => {
       try {
         setState({ records: state.records, loading: true });
         const feed = await getDrupalApiResults(drupalVersion, searchText || "");
@@ -21,16 +21,16 @@ const Command = () => {
           error: error instanceof Error ? error : new Error("Something went wrong"),
         });
       }
-    }
+    };
 
     fetchRecords();
   }, [searchText, drupalVersion]);
 
   let noResultsText = "No results...";
-  let noResultsIcon: Icon | undefined = Icon.Important;
+  let noResultsIcon: Icon | null = Icon.Important;
   if (!state.loading && !searchText) {
     noResultsText = "Type something to search.";
-    noResultsIcon = undefined;
+    noResultsIcon = null;
   }
   if (state.error) {
     noResultsText = "Error: " + state.error.message;
@@ -67,8 +67,16 @@ const Command = () => {
               <ActionPanel>
                 <Action.OpenInBrowser url={item.url} />
                 <Action.CopyToClipboard title="Copy URL to Clipboard" content={item.url} />
-                <Action.CopyToClipboard title="Copy Drupal Location to Clipboard" content={item.location} />
-                <Action.CopyToClipboard title="Copy Title to Clipboard" content={item.title} />
+                <Action.CopyToClipboard
+                  title="Copy Drupal Location to Clipboard"
+                  content={item.location}
+                  shortcut={{ modifiers: ["opt", "cmd"], key: "l" }}
+                />
+                <Action.CopyToClipboard
+                  title="Copy Title to Clipboard"
+                  content={item.title}
+                  shortcut={{ modifiers: ["opt", "cmd"], key: "t" }}
+                />
               </ActionPanel>
             }
           />
