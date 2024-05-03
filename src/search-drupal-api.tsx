@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Action, ActionPanel, List } from "@raycast/api";
+import { Action, ActionPanel, Icon, List } from "@raycast/api";
 import { getDrupalApiResults } from "./util";
 import { DrupalVersionMachineCode, SearchState } from "./types";
 import Dropdown from "./dropdown";
@@ -26,15 +26,20 @@ const Command = () => {
     fetchRecords();
   }, [searchText, drupalVersion]);
 
-  let noResultsText = "";
+  let noResultsText = "No results...";
+  let noResultsIcon: Icon | undefined = Icon.Important;
+  if (!state.loading && !searchText) {
+    noResultsText = "Type something to search.";
+    noResultsIcon = undefined;
+  }
   if (state.error) {
     noResultsText = "Error: " + state.error.message;
   }
-  if (!state.loading && !state.records?.length) {
+  if (state.loading) {
+    noResultsText = "Loading...";
+    noResultsIcon = Icon.CircleProgress;
     if (searchText) {
-      noResultsText = "No items matched your search query.";
-    } else {
-      noResultsText = "Please type something to search.";
+      noResultsText = "Searching...";
     }
   }
 
@@ -48,7 +53,7 @@ const Command = () => {
       isShowingDetail
       searchBarAccessory={<Dropdown onVersionChange={setDrupalVersion} />}
     >
-      <List.EmptyView title={noResultsText}></List.EmptyView>
+      <List.EmptyView title={noResultsText} icon={noResultsIcon} />
       {state.records?.map((item, index) => {
         const detailsMarkdown = `# ${item.title}\n\n**Type:** ${item.type}\n\n**Description**: ${item.description}\n\n**Location**: ${item.location}\n\n[Go to Drupal.org](${item.url})`;
 
