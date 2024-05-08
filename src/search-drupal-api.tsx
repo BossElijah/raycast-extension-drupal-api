@@ -52,6 +52,7 @@ const Command = () => {
       searchBarPlaceholder="Search the Drupal API..."
       isShowingDetail
       searchBarAccessory={<Dropdown onVersionChange={setDrupalVersion} />}
+      filtering={false}
     >
       <List.EmptyView title={noResultsText} icon={noResultsIcon} />
       {state.records?.map((item, index) => {
