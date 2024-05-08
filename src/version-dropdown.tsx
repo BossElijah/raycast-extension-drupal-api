@@ -7,7 +7,7 @@ interface DropdownProps {
   onVersionChange: Dispatch<SetStateAction<DrupalVersionMachineCode>>;
 }
 
-const Dropdown = ({ onVersionChange }: DropdownProps) => (
+const VersionDropdown = ({ onVersionChange }: DropdownProps) => (
   <List.Dropdown
     tooltip="Select Drupal version to search in"
     storeValue={true}
@@ -23,4 +23,4 @@ const Dropdown = ({ onVersionChange }: DropdownProps) => (
   </List.Dropdown>
 );
 
-export default Dropdown;
+export default VersionDropdown;

@@ -2,19 +2,25 @@ import { useEffect, useState } from "react";
 import { Action, ActionPanel, Icon, List } from "@raycast/api";
 import { getDrupalApiResults } from "./util";
 import { DrupalVersionMachineCode, SearchState } from "./types";
-import Dropdown from "./dropdown";
+import VersionDropdown from "./version-dropdown";
+import TypeDropdown from "./type-dropdown";
 
 const Command = () => {
   const [state, setState] = useState<SearchState>({});
   const [searchText, setSearchText] = useState<string>("");
   const [drupalVersion, setDrupalVersion] = useState<DrupalVersionMachineCode>(DrupalVersionMachineCode.Drupal10);
+  const [type, setType] = useState<string>("");
 
   useEffect(() => {
     const fetchRecords = async () => {
       try {
         setState({ records: state.records, loading: true });
         const feed = await getDrupalApiResults(drupalVersion, searchText || "");
-        setState({ records: feed, loading: false });
+        if (type) {
+          setState({ records: feed.filter((item) => item.type === type), loading: false });
+        } else {
+          setState({ records: feed, loading: false });
+        }
       } catch (error) {
         console.error(error);
         setState({
@@ -24,7 +30,7 @@ const Command = () => {
     };
 
     fetchRecords();
-  }, [searchText, drupalVersion]);
+  }, [searchText, drupalVersion, type]);
 
   let noResultsText = "No results...";
   let noResultsIcon: Icon | null = Icon.Important;
@@ -51,8 +57,10 @@ const Command = () => {
       throttle
       searchBarPlaceholder="Search the Drupal API..."
       isShowingDetail
-      searchBarAccessory={<Dropdown onVersionChange={setDrupalVersion} />}
+      searchBarAccessory={<VersionDropdown onVersionChange={setDrupalVersion} />}
+      filtering={false}
     >
+      <TypeDropdown onTypeChange={setType} />
       <List.EmptyView title={noResultsText} icon={noResultsIcon} />
       {state.records?.map((item, index) => {
         const detailsMarkdown = `# ${item.title}\n\n**Type:** ${item.type}\n\n**Description**: ${item.description}\n\n**Location**: ${item.location}\n\n[Go to Drupal.org](${item.url})`;
